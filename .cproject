@@ -47,6 +47,7 @@
 									<listOptionValue builtIn="false" value="Qt5Core"/>
 									<listOptionValue builtIn="false" value="Qt5Gui"/>
 									<listOptionValue builtIn="false" value="Qt5Widgets"/>
+									<listOptionValue builtIn="false" value="Qt5Network"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.456396965" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

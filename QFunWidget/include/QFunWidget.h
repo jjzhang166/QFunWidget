@@ -10,6 +10,8 @@
 #include <QtCore/QVector>
 #include <QtWidgets/QWidget>
 
+class QUdpSocket;
+
 /** 一个有趣的窗体.
  * 使用方法:
  * 	构建一个QFunWidget对象,可以指定水平方向,竖直方向上网格的个数,同时也可以指定网格的大小.
@@ -32,6 +34,7 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent *);
 	virtual void paintEvent(QPaintEvent *);
 	virtual void resizeEvent(QResizeEvent *);
+	virtual void setVisible(bool visible);
 
 	virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
@@ -61,13 +64,16 @@ private:
 	void setXY(const QPoint &pos,bool set);
 	QRect drawRect(int x,int y)const;
 	QSize calcSize(int zoomFactor)const;
+	void onUdpClientReadyRead();
 
 	GridMap _Map;
 	int _ZoomFactor;/* 指定了网格的大小为_ZoomFactor*_ZoomFactor,单位为像素 */
 	QRgb _Color;/* 对网格上色时使用的颜色,根据本机IP地址决定 */
+	QUdpSocket *_Udp;
 
 	static const int _GridLineSize = 1;/** 网格线的宽度/高度,为1个像素 */
 	static const int _MinZoomFactor = 3;
+	static const int _Port = 9307;/* 使用的端口 */
 };
 
 /**********************************************************************************************************************************************************************/

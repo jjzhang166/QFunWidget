@@ -5,20 +5,61 @@
  */
 #include <QtCore/qmath.h>
 #include <QtCore/QSize>
+#include <QtCore/QList>
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
+#include <QtWidgets/QMessageBox>
+#include <QtNetwork/QUdpSocket>
+#include <QtNetwork/QNetworkInterface>
 
 #include "QtException.h"
 #include "QFunWidget.h"
+#include "QFunWidgetPacket.h"
 #include "macros.h"
+
+static QList<QNetworkInterface> localNetworkInterfaces =  QNetworkInterface::allInterfaces();/** 本机接口集合 */
+static QList<QHostAddress> localHostAddresses = QNetworkInterface::allAddresses();
+
+/** 在当前已知的所有网络接口上,发送UDP广播数据包.
+ * @param udp 套接字
+ * @param data UDP数据包的数据部分 */
+void advanceBoardcast(QUdpSocket *udp,int _Port,const QByteArray &data){
+//	for(int ci = 0;ci<localNetworkInterfaces.size();++ci){
+//		QNetworkInterface &interface = localNetworkInterfaces.at(ci);
+//		QList<QNetworkAddressEntry> addresses = interface.addressEntries();
+//		for(int cj = 0;cj<addresses.size();++cj){
+//			QNetworkAddressEntry &entry = addresses.at(cj);
+//			entry.broadcast()
+//		}
+//	}
+	udp->writeDatagram(data,QHostAddress::Broadcast,_Port);
+}
+
+/* 如果 from 属于本地地址之一,则返回真;否则返回假 */
+bool isFromLocal(const QHostAddress &from){
+	return localHostAddresses.contains(from);
+}
+
+/** 根据IP地址from来计算颜色 */
+QRgb colorFrom(const QHostAddress &from){
+	if(from.protocol() == QAbstractSocket::IPv4Protocol){
+		quint32 ip = from.toIPv4Address();
+		int r = ((ip & 0x00ff0000) >> 16);
+		int g = ((ip & 0x0000ff00) >> 8);
+		int b = ((ip & 0x000000ff));
+		return qRgb(r,g,b);
+	}else
+		return qRgb(93,07,17);/* 换成随机数,会不会好一点呢 */
+}
 
 QFunWidget::QFunWidget(int hnum ,int vnum,int zoomFactor,QWidget *parent):
 	QWidget(parent),
 	_Map(hnum,vnum),
 	_ZoomFactor(zoomFactor),
-	_Color(color())
+	_Color(color()),
+	_Udp(new QUdpSocket(this))
 {
-	;
+	connect(_Udp,&QUdpSocket::readyRead,this,&QFunWidget::onUdpClientReadyRead);
 }
 
 void QFunWidget::setHNum(int hnum){
@@ -109,7 +150,12 @@ void QFunWidget::setXY(const QPoint &pos,bool set){
 	}catch(const QtException &){
 		return ;
 	}
-	/* TODO 发送UDP广播数据包 */
+	QFunWidgetPacket packet;
+	packet.setVersion(1);
+	packet.setOpCode(set);
+	packet.setX(xnum);
+	packet.setY(ynum);
+	advanceBoardcast(_Udp,_Port,packet.serialize());
 	update();/* TODO 这里应该产生一个局部重绘 */
 }
 
@@ -128,5 +174,57 @@ QSize QFunWidget::minimumSizeHint() const{
 
 QSize QFunWidget::calcSize(int zoomFactor)const{
 	return QSize(hnum()*(zoomFactor+1)+1,vnum()*(zoomFactor+1)+1);
+}
+
+/** 当可见时,监听指定端口,当不可见时,停止监听 */
+void QFunWidget::setVisible(bool visible){
+	if(isVisible() != visible ){
+		if(visible){
+			if(!_Udp->bind(_Port)){
+				QString str = "监听 ";
+				str += QString::number(_Port);
+				str += " 端口出错: ";
+				str += _Udp->errorString();
+				str += ";将无法收到其他小伙伴的轨迹";
+				QMessageBox::warning(this,"无法监听端口",str);
+			}
+		}else
+			_Udp->close();/* 停止监听 */
+	}
+	QWidget::setVisible(visible);
+}
+/* 此时收到了网络上的数据包,并处理收来的数据包 */
+void QFunWidget::onUdpClientReadyRead(){
+	QByteArray buf;
+	QHostAddress from;
+
+	while(_Udp->hasPendingDatagrams()){
+		buf.resize(_Udp->pendingDatagramSize());
+		int realead = _Udp->readDatagram(buf.data(),buf.size(),&from,0);
+		if(realead > 0){
+			if(realead != buf.size())
+				buf.resize(realead);
+			if(!isFromLocal(from)){/* 由本地发送的数据包将会被过滤  */
+				QFunWidgetPacket packet;
+				try{
+					QFunWidgetPacket::createFrom(buf,packet);
+					if(packet.opCode() == 0 )
+						_Map.clearXY(packet.x(),packet.y());
+					else
+						_Map.setColorAt(packet.x(),packet.y(),colorFrom(from));
+					update();
+				}catch(const QtException &){/* 抛出异常,则表明本次接受的数据包不合法,所以 */
+					continue;
+				}
+			}
+		}else{
+			QString str = "读取 ";
+			str += QString::number(_Port);
+			str += " 端口出错: ";
+			str += _Udp->errorString();
+			str += ";将无法收到其他小伙伴的轨迹";
+			QMessageBox::warning(this,"读取失败",str);
+		}
+	}
 }
 
