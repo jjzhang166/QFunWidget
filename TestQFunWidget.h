@@ -6,7 +6,7 @@
 #ifndef ORG_WANGWEI_QFUNWIDGET_TESTQFUNWIDGET_H_
 #define ORG_WANGWEI_QFUNWIDGET_TESTQFUNWIDGET_H_
 
-#include <QtWidgets/QWidget>
+#include <QtGui/QWidget>
 
 class QFunWidget;
 class QLineEdit;

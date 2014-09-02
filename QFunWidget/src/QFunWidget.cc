@@ -9,7 +9,7 @@
 #include <QtCore/QTime>
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
-#include <QtWidgets/QMessageBox>
+#include <QtGui/QMessageBox>
 #include <QtNetwork/QUdpSocket>
 #include <QtNetwork/QNetworkInterface>
 
@@ -20,20 +20,13 @@
 
 static QList<QNetworkInterface> localNetworkInterfaces =  QNetworkInterface::allInterfaces();/** 本机接口集合 */
 static QList<QHostAddress> localHostAddresses = QNetworkInterface::allAddresses();
+const QHostAddress QFunWidget::_MultiCast("224.93.07.17");
 
 /** 在当前已知的所有网络接口上,发送UDP广播数据包.
  * @param udp 套接字
  * @param data UDP数据包的数据部分 */
 void advanceBoardcast(QUdpSocket *udp,int _Port,const QByteArray &data){
-//	for(int ci = 0;ci<localNetworkInterfaces.size();++ci){
-//		QNetworkInterface &interface = localNetworkInterfaces.at(ci);
-//		QList<QNetworkAddressEntry> addresses = interface.addressEntries();
-//		for(int cj = 0;cj<addresses.size();++cj){
-//			QNetworkAddressEntry &entry = addresses.at(cj);
-//			entry.broadcast()
-//		}
-//	}
-	udp->writeDatagram(data,QHostAddress::Broadcast,_Port);
+	udp->writeDatagram(data,QFunWidget::_MultiCast,_Port);
 }
 
 /* 如果 from 属于本地地址之一,则返回真;否则返回假 */
@@ -60,7 +53,10 @@ QFunWidget::QFunWidget(int hnum ,int vnum,int zoomFactor,QWidget *parent):
 	_Color(color()),
 	_Udp(new QUdpSocket(this))
 {
-	connect(_Udp,&QUdpSocket::readyRead,this,&QFunWidget::onUdpClientReadyRead);
+	connect(_Udp,SIGNAL(readyRead()),this,SLOT(onUdpClientReadyRead()));
+	if( !_Udp->bind(QHostAddress::Any,_Port) ||  !_Udp->joinMulticastGroup(_MultiCast))
+		QMessageBox::warning(this,"将无法收取信息",_Udp->errorString());
+
 	QTime time =  QTime::currentTime();
 	qsrand(time.msec()+time.second()*1000);
 }
@@ -108,7 +104,7 @@ void QFunWidget::mouseMoveEvent(QMouseEvent *e){
 		return ;/* 如果同时按钮左键/右键,则返回 */
 	if( (e->buttons() & Qt::LeftButton ) ==0 && (e->buttons() & Qt::RightButton)==0 )
 		return ;/* 如果即没有按住左键,也没有按住右键,则返回 */
-	setXY(e->pos(),e->buttons() & Qt::LeftButton);
+	setXY(e->pos(),(e->buttons() & Qt::LeftButton)!=0);
 }
 
 void QFunWidget::resizeEvent(QResizeEvent *e){
@@ -147,8 +143,6 @@ void QFunWidget::setXY(const QPoint &pos,bool set){
 	int xnum = pos.x()/(zoomFactor()+gridLineSize());/* (xnum,ynum)就是鼠标指向网格的坐标 */
 	int ynum = pos.y()/(zoomFactor()+gridLineSize());
 
-//	if(xnum >= this->hnum() || ynum >= this->vnum())/* 越界,将该判断放入_Map.setXY()内部进行 */
-//		return ;
 	try{
 		if(set)
 			_Map.setColorAt(xnum,ynum,_Color);
@@ -183,23 +177,6 @@ QSize QFunWidget::calcSize(int zoomFactor)const{
 	return QSize(hnum()*(zoomFactor+1)+1,vnum()*(zoomFactor+1)+1);
 }
 
-/** 当可见时,监听指定端口,当不可见时,停止监听 */
-void QFunWidget::setVisible(bool visible){
-	if(isVisible() != visible ){
-		if(visible){
-			if(!_Udp->bind(_Port)){
-				QString str = "监听 ";
-				str += QString::number(_Port);
-				str += " 端口出错: ";
-				str += _Udp->errorString();
-				str += ";将无法收到其他小伙伴的轨迹";
-				QMessageBox::warning(this,"无法监听端口",str);
-			}
-		}else
-			_Udp->close();/* 停止监听 */
-	}
-	QWidget::setVisible(visible);
-}
 /* 此时收到了网络上的数据包,并处理收来的数据包 */
 void QFunWidget::onUdpClientReadyRead(){
 	QByteArray buf;

@@ -6,7 +6,6 @@
 #include "QFunWidget.h"
 
 #include <QtGui/QtGui>
-#include <QtWidgets/QtWidgets>
 
 #include "TestQFunWidget.h"
 
@@ -21,9 +20,9 @@ TestQFunWidget::TestQFunWidget(QWidget *parent):
 		_LineEdits[ci]->setPlaceholderText(LineEditTooltip[ci]);
 		bottom->addWidget(_LineEdits[ci]);
 	}
-	connect(_LineEdits[HNum],&QLineEdit::returnPressed,this,&TestQFunWidget::onHNumLineEditEnter);
-	connect(_LineEdits[VNum],&QLineEdit::returnPressed,this,&TestQFunWidget::onVNumLineEditEnter);
-	connect(_LineEdits[Zoom],&QLineEdit::returnPressed,this,&TestQFunWidget::onZoomLineEditEnter);
+	connect(_LineEdits[HNum],SIGNAL(returnPressed()),this,SLOT(onHNumLineEditEnter()));
+	connect(_LineEdits[VNum],SIGNAL(returnPressed()),this,SLOT(onVNumLineEditEnter()));
+	connect(_LineEdits[Zoom],SIGNAL(returnPressed()),this,SLOT(onZoomLineEditEnter()));
 	QVBoxLayout *root = new QVBoxLayout;
 	root->addWidget(_FunWidget = new QFunWidget);
 	root->addLayout(bottom);

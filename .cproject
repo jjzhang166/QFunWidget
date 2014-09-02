@@ -26,7 +26,7 @@
 								<option id="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level.868654290" name="Debug Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.dialect.std.253199073" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.396034403" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;D:\Qt5.3.0.mingw\5.3\mingw482_32\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;D:\Qt4.8.6.mingw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/QFunWidget/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Global/include}&quot;"/>
 								</option>
@@ -41,13 +41,12 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.568188983" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.999435799" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug">
 								<option id="gnu.cpp.link.option.paths.1976257820" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;D:\Qt5.3.0.mingw\5.3\mingw482_32\lib&quot;"/>
+									<listOptionValue builtIn="false" value="D:\Qt4.8.6.mingw\lib"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1039040164" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="Qt5Core"/>
-									<listOptionValue builtIn="false" value="Qt5Gui"/>
-									<listOptionValue builtIn="false" value="Qt5Widgets"/>
-									<listOptionValue builtIn="false" value="Qt5Network"/>
+									<listOptionValue builtIn="false" value="QtCore4"/>
+									<listOptionValue builtIn="false" value="QtGui4"/>
+									<listOptionValue builtIn="false" value="QtNetwork4"/>
 								</option>
 								<option id="gnu.cpp.link.option.flags.330099444" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-Wl,-subsystem,windows" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.456396965" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
@@ -85,7 +84,7 @@
 								<option id="gnu.cpp.compiler.mingw.exe.release.option.optimization.level.122126773" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.exe.release.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.mingw.exe.release.option.debugging.level.1190946986" name="Debug Level" superClass="gnu.cpp.compiler.mingw.exe.release.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1645497228" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;D:\Qt5.3.0.mingw\5.3\mingw482_32\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;D:\Qt4.8.6.mingw\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/QFunWidget/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Global/include}&quot;"/>
 								</option>
@@ -101,13 +100,12 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.release.579501079" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.release"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.release.76719329" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.release">
 								<option id="gnu.cpp.link.option.paths.1327757601" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="D:\Qt5.3.0.mingw\5.3\mingw482_32\lib"/>
+									<listOptionValue builtIn="false" value="D:\Qt4.8.6.mingw\lib"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1535798192" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="Qt5Core"/>
-									<listOptionValue builtIn="false" value="Qt5Gui"/>
-									<listOptionValue builtIn="false" value="Qt5Widgets"/>
-									<listOptionValue builtIn="false" value="Qt5Network"/>
+									<listOptionValue builtIn="false" value="QtCore4"/>
+									<listOptionValue builtIn="false" value="QtGui4"/>
+									<listOptionValue builtIn="false" value="QtNetwork4"/>
 								</option>
 								<option id="gnu.cpp.link.option.flags.341188440" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-Wl,-subsystem,windows" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1361388590" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">

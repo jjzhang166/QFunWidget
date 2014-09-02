@@ -8,7 +8,8 @@
 
 #include <QtCore/QBitArray>
 #include <QtCore/QVector>
-#include <QtWidgets/QWidget>
+#include <QtNetwork/QHostAddress>
+#include <QtGui/QWidget>
 
 class QUdpSocket;
 
@@ -17,6 +18,7 @@ class QUdpSocket;
  * 	构建一个QFunWidget对象,可以指定水平方向,竖直方向上网格的个数,同时也可以指定网格的大小.
  * 	然后显示出来即可 */
 class QFunWidget: public QWidget {
+	Q_OBJECT
 public:
 	QFunWidget(int hnum = 93 ,int vnum = 77,int zoomFactor = 7,QWidget *parent = 0);
 	void setHNum(int hnum);
@@ -34,7 +36,6 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent *);
 	virtual void paintEvent(QPaintEvent *);
 	virtual void resizeEvent(QResizeEvent *);
-	virtual void setVisible(bool visible);
 
 	virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
@@ -58,13 +59,16 @@ private:
 	static const QRgb _ClrColor;/* 当调用 clearXY() 时使用的颜色 */
 };
 
+private slots:
+	void onUdpClientReadyRead();
+
 private:
 	static QRgb color() ;
 
 	void setXY(const QPoint &pos,bool set);
 	QRect drawRect(int x,int y)const;
 	QSize calcSize(int zoomFactor)const;
-	void onUdpClientReadyRead();
+
 
 	GridMap _Map;
 	int _ZoomFactor;/* 指定了网格的大小为_ZoomFactor*_ZoomFactor,单位为像素 */
@@ -74,6 +78,8 @@ private:
 	static const int _GridLineSize = 1;/** 网格线的宽度/高度,为1个像素 */
 	static const int _MinZoomFactor = 3;
 	static const int _Port = 9307;/* 使用的端口 */
+public:
+	static const QHostAddress _MultiCast;
 };
 
 /**********************************************************************************************************************************************************************/
