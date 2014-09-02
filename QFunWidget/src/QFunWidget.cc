@@ -86,10 +86,7 @@ void QFunWidget::paintEvent(QPaintEvent *e){
 	for(int ci = 0;ci<_Map.hnum();++ci){
 		for(int cj=0;cj<_Map.vnum();++cj){
 			QRect rect = drawRect(ci,cj);
-			if(_Map.testXY(ci,cj))
-				painter.fillRect(rect,_Color);
-			else /* 让指定的网格处没有上色,则以白色填充 */
-				painter.fillRect(rect,Qt::white);
+			painter.fillRect(rect,_Map.colorAt(ci,cj));
 		}
 	}
 }
@@ -105,7 +102,10 @@ void QFunWidget::setXY(const QPoint &pos,bool set){
 //	if(xnum >= this->hnum() || ynum >= this->vnum())/* 越界,将该判断放入_Map.setXY()内部进行 */
 //		return ;
 	try{
-		_Map.setXY(xnum,ynum,set);
+		if(set)
+			_Map.setColorAt(xnum,ynum,_Color);
+		else
+			_Map.clearXY(xnum,ynum);
 	}catch(const QtException &){
 		return ;
 	}

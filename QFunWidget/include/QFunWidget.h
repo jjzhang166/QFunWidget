@@ -37,21 +37,22 @@ protected:
     virtual QSize minimumSizeHint() const;
 
 private:
-/** 保存QFunWidget上每一个网格的上色情况,由于颜色是固定的,所以只需要保存网格是否上色与否即可.
- * 在GridMap中,使用1bit来保存一个网格的上色情况. */
+/** 保存QFunWidget上每一个网格的上色情况,即保存每一个网格对应的rgb颜色
+ * 在GridMap中,使用QRgb来保存一个网格的上色情况.  */
 class GridMap{
 public:
 	inline GridMap(int hnum,int vnum);
 	void setHNum(int hnum);
 	void setVNum(int vnum);
-	void setXY(int x,int y,bool set=true);
+	void setColorAt(int x,int y,QRgb color);
 	inline void clearXY(int x,int y);
 
 	int hnum()const;
 	int vnum()const;
-	bool testXY(int x,int y)const;
+	QRgb colorAt(int x,int y)const;
 private:
-	QVector<QBitArray> _Map;
+	QVector<QVector<QRgb> > _Map;
+	static const QRgb _ClrColor;/* 当调用 clearXY() 时使用的颜色 */
 };
 
 private:
@@ -68,6 +69,9 @@ private:
 	static const int _GridLineSize = 1;/** 网格线的宽度/高度,为1个像素 */
 	static const int _MinZoomFactor = 3;
 };
+
+/**********************************************************************************************************************************************************************/
+
 
 inline int QFunWidget::hnum()const{
 	return _Map.hnum();
@@ -86,12 +90,12 @@ inline int QFunWidget::gridLineSize(){
 }
 
 inline QFunWidget::GridMap::GridMap(int hnum,int vnum):
-	_Map(vnum,QBitArray(hnum,false))
+	_Map(vnum,QVector<QRgb>(hnum,_ClrColor))
 {
 	;
 }
 inline void QFunWidget::GridMap::clearXY(int x,int y){
-	this->setXY(x,y,false);
+	this->setColorAt(x,y,_ClrColor);
 }
 
 
