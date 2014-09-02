@@ -6,6 +6,7 @@
 #include <QtCore/qmath.h>
 #include <QtCore/QSize>
 #include <QtCore/QList>
+#include <QtCore/QTime>
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QMessageBox>
@@ -49,7 +50,7 @@ QRgb colorFrom(const QHostAddress &from){
 		int b = ((ip & 0x000000ff));
 		return qRgb(r,g,b);
 	}else
-		return qRgb(93,07,17);/* 换成随机数,会不会好一点呢 */
+		return qRgb(qrand()%256,qrand()%256,qrand()%256);/* 换成随机数,会不会好一点呢 */
 }
 
 QFunWidget::QFunWidget(int hnum ,int vnum,int zoomFactor,QWidget *parent):
@@ -60,6 +61,8 @@ QFunWidget::QFunWidget(int hnum ,int vnum,int zoomFactor,QWidget *parent):
 	_Udp(new QUdpSocket(this))
 {
 	connect(_Udp,&QUdpSocket::readyRead,this,&QFunWidget::onUdpClientReadyRead);
+	QTime time =  QTime::currentTime();
+	qsrand(time.msec()+time.second()*1000);
 }
 
 void QFunWidget::setHNum(int hnum){
@@ -127,13 +130,17 @@ void QFunWidget::paintEvent(QPaintEvent *e){
 	for(int ci = 0;ci<_Map.hnum();++ci){
 		for(int cj=0;cj<_Map.vnum();++cj){
 			QRect rect = drawRect(ci,cj);
-			painter.fillRect(rect,_Map.colorAt(ci,cj));
+			if (!e->region().intersected(rect).isEmpty())
+				painter.fillRect(rect,_Map.colorAt(ci,cj));
 		}
 	}
 }
 
 QRgb QFunWidget::color() {
-	return qRgb(93,07,17);/* TODO 后期改为由IP地址来决定颜色值 */
+	if(localHostAddresses.isEmpty())
+		return qRgb(qrand()%256,qrand()%256,qrand()%256);
+	else
+		return colorFrom(localHostAddresses.at(0));
 }
 
 void QFunWidget::setXY(const QPoint &pos,bool set){
@@ -156,7 +163,7 @@ void QFunWidget::setXY(const QPoint &pos,bool set){
 	packet.setX(xnum);
 	packet.setY(ynum);
 	advanceBoardcast(_Udp,_Port,packet.serialize());
-	update();/* TODO 这里应该产生一个局部重绘 */
+	update(drawRect(xnum,ynum));
 }
 
 /** 返回x,y处的网格所对应的矩形区域,不包括网格四边的网格线 */
